@@ -13,10 +13,15 @@
 ### Task 0: Lock Clarified Architecture Decisions In Docs
 
 **Files:**
+- Create: `package.json`
+- Create: `package-lock.json`
+- Create: `tests/repo/architecture-decisions.test.ts`
 - Modify: `docs/plans/2026-03-23-multi-tenant-spend-management-architecture-spec.md`
 - Modify: `docs/plans/2026-03-23-multi-tenant-spend-management-implementation-plan.md`
 
 **Step 1: Write the failing doc-consistency check**
+
+Create a minimal root `package.json` with `vitest` as a dev dependency so the repo can execute a single doc-consistency test before the monorepo bootstrap work begins.
 
 Add a lightweight repo test at `tests/repo/architecture-decisions.test.ts` asserting the docs explicitly mention:
 - Auth.js credentials-based email/password
@@ -25,6 +30,9 @@ Add a lightweight repo test at `tests/repo/architecture-decisions.test.ts` asser
 - `MailHog`
 - SMTP-backed invites
 - repository helpers for tenant-scoped access
+- upload metadata persists before enqueue
+- worker job payloads carry stable identifiers only
+- workers reload tenant-scoped records from the database before mutating them
 
 **Step 2: Run test to verify it fails**
 
@@ -40,6 +48,16 @@ Update the current docs so the implementation phase is decision complete for:
 - tenant-scoped data-access enforcement
 - upload/job payload guarantees
 
+Required wording outcomes:
+- Auth.js credentials-based email/password remain the only MVP auth mechanism.
+- Auth.js uses database sessions, not JWT sessions, for the MVP.
+- Local object storage is `MinIO`.
+- Local invite/email inspection uses `MailHog`.
+- Invites are delivered through an SMTP-backed email flow.
+- Tenant-owned reads and writes must go through shared repository helpers that require `tenant_id`.
+- Upload metadata is persisted before enqueueing extraction jobs.
+- Worker job payloads carry stable identifiers only, and workers reload tenant-scoped records from the database before mutating them.
+
 **Step 4: Run test to verify it passes**
 
 Run: `npm exec vitest run tests/repo/architecture-decisions.test.ts`
@@ -48,7 +66,7 @@ Expected: PASS.
 **Step 5: Commit**
 
 ```bash
-git add docs/plans/2026-03-23-multi-tenant-spend-management-architecture-spec.md docs/plans/2026-03-23-multi-tenant-spend-management-implementation-plan.md tests/repo/architecture-decisions.test.ts
+git add package.json package-lock.json docs/plans/2026-03-23-multi-tenant-spend-management-architecture-spec.md docs/plans/2026-03-23-multi-tenant-spend-management-implementation-plan.md tests/repo/architecture-decisions.test.ts
 git commit -m "docs: lock implementation decisions before bootstrap"
 ```
 

@@ -171,6 +171,7 @@ Required behavior:
 - tenant-owned queries always flow through helpers that require `tenant_id`
 - authorization evaluates tenant access before role or team-scope rules
 - workers apply the same tenant-scoping rules when loading or mutating tenant-owned records
+- pages, server actions, route handlers, and workers must not bypass these repository helpers for tenant-owned reads or writes
 
 This is an implementation constraint, not an optional code-organization preference.
 
@@ -461,8 +462,11 @@ Required payload fields:
 
 The payload must contain enough identity data to resolve the correct upload and enforce idempotent draft creation without relying on ambient runtime state.
 
+The worker job payload must carry stable identifiers only. It must not embed mutable tenant-owned records or trust request-time objects passed from the web runtime.
+
 ### Expected Worker Behavior
 - validate payload before processing
+- reload tenant-scoped records from the database before mutating them
 - fetch file using object storage metadata
 - call OpenAI with file input
 - extract merchant or description, amount, and date when possible
