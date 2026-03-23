@@ -1,0 +1,11 @@
+{
+  "name": "@expense-manager/worker",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "build": "tsc -p tsconfig.json",
+    "lint": "echo \"worker lint placeholder\"",
+    "test": "vitest run"
+  }
+}
