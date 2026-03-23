@@ -1,5 +1,15 @@
 {
   "name": "@expense-manager/auth",
   "private": true,
-  "version": "0.0.0"
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@expense-manager/db": "workspace:*",
+    "@expense-manager/domain": "workspace:*",
+    "bcryptjs": "^3.0.3",
+    "zod": "^4.3.6"
+  }
 }

@@ -2,10 +2,29 @@
   "name": "@expense-manager/web",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "lint": "next lint",
     "test": "vitest run"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
+    "@expense-manager/auth": "workspace:*",
+    "@expense-manager/db": "workspace:*",
+    "@expense-manager/domain": "workspace:*",
+    "@expense-manager/validation": "workspace:*",
+    "bcryptjs": "^3.0.3",
+    "next": "^16.2.1",
+    "next-auth": "5.0.0-beta.30",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2"
   }
 }
