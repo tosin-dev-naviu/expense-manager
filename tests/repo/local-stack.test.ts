@@ -6,6 +6,12 @@ const rootDir = process.cwd();
 
 const composeFile = readFileSync(join(rootDir, "docker-compose.yml"), "utf8");
 const envExample = readFileSync(join(rootDir, ".env.example"), "utf8");
+const dockerfiles = [
+  readFileSync(join(rootDir, "Dockerfile.web"), "utf8"),
+  readFileSync(join(rootDir, "Dockerfile.worker"), "utf8"),
+  readFileSync(join(rootDir, "apps/web/Dockerfile"), "utf8"),
+  readFileSync(join(rootDir, "apps/worker/Dockerfile"), "utf8"),
+];
 
 describe("local infrastructure baseline", () => {
   it("defines the required local services and environment variable groups", () => {
@@ -40,6 +46,16 @@ describe("local infrastructure baseline", () => {
       "OPENAI_API_KEY=",
     ]) {
       expect(envExample).toContain(envVariable);
+    }
+  });
+
+  it("keeps container dependency installation aligned with the pnpm workspace", () => {
+    expect(readFileSync(join(rootDir, "package.json"), "utf8")).toContain('"packageManager": "pnpm@');
+    expect(readFileSync(join(rootDir, "pnpm-lock.yaml"), "utf8")).toContain("lockfileVersion:");
+
+    for (const dockerfile of dockerfiles) {
+      expect(dockerfile).toContain("pnpm-lock.yaml");
+      expect(dockerfile).not.toContain("package-lock.json");
     }
   });
 });
