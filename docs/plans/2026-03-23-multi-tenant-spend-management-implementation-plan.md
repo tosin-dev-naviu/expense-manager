@@ -12,6 +12,8 @@
 
 ### Task 0: Lock Clarified Architecture Decisions In Docs
 
+**Status:** Done
+
 **Files:**
 - Create: `package.json`
 - Create: `package-lock.json`
@@ -71,6 +73,8 @@ git commit -m "docs: lock implementation decisions before bootstrap"
 ```
 
 ### Task 1: Bootstrap Monorepo Foundation
+
+**Status:** Done
 
 **Files:**
 - Create: `pnpm-workspace.yaml`

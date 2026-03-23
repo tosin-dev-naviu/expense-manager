@@ -1,0 +1,110 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    command:
+      - node
+      - -e
+      - |
+        require("node:http")
+          .createServer((_, response) => {
+            response.writeHead(200, { "content-type": "text/plain" });
+            response.end("expense-manager web placeholder\n");
+          })
+          .listen(3000, "0.0.0.0", () => {
+            console.log("web placeholder listening on http://0.0.0.0:3000");
+          });
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/expense_manager
+      AUTH_SECRET: change-me
+      AUTH_URL: http://localhost:3000
+      AUTH_TRUST_HOST: "true"
+      SMTP_HOST: mailhog
+      SMTP_PORT: "1025"
+      SMTP_USER: ""
+      SMTP_PASSWORD: ""
+      EMAIL_FROM: no-reply@example.com
+      REDIS_URL: redis://redis:6379
+      S3_ENDPOINT: http://minio:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: expense-manager
+      S3_ACCESS_KEY_ID: minioadmin
+      S3_SECRET_ACCESS_KEY: minioadmin
+      S3_FORCE_PATH_STYLE: "true"
+      OPENAI_API_KEY: replace-me
+    depends_on:
+      - postgres
+      - redis
+      - minio
+      - mailhog
+    ports:
+      - "3000:3000"
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    command:
+      - node
+      - -e
+      - |
+        console.log("worker placeholder started");
+        setInterval(() => {
+          console.log("worker placeholder heartbeat");
+        }, 60000);
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/expense_manager
+      REDIS_URL: redis://redis:6379
+      SMTP_HOST: mailhog
+      SMTP_PORT: "1025"
+      S3_ENDPOINT: http://minio:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: expense-manager
+      S3_ACCESS_KEY_ID: minioadmin
+      S3_SECRET_ACCESS_KEY: minioadmin
+      S3_FORCE_PATH_STYLE: "true"
+      OPENAI_API_KEY: replace-me
+    depends_on:
+      - postgres
+      - redis
+      - minio
+      - mailhog
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: expense_manager
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  minio:
+    image: minio/minio:RELEASE.2025-02-07T23-21-09Z
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  postgres-data:
+  minio-data:
